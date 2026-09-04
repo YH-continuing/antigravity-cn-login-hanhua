@@ -9,6 +9,7 @@
   "target_processes": [
     "language_server_windows",
     "language_server.exe",
+    "antigravity-ide",
     "Antigravity.exe",
     "Antigravity IDE.exe",
     "node.exe"

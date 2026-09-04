@@ -1,10 +1,11 @@
 @echo off
 chcp 65001 >nul
 setlocal enabledelayedexpansion
-title Antigravity CN 登录修复 + 汉化（No-TUN 一步到位）
+title Antigravity CN：登录修复 + 汉化（No-TUN 一步到位）
 
 echo ==========================================================
 echo   Antigravity CN：登录修复 + 汉化（不开 TUN/Proxifier）
+echo   适用：主应用 antigravity + Antigravity IDE
 echo ==========================================================
 echo.
 
@@ -12,17 +13,24 @@ set "PROXY_HOST=127.0.0.1"
 set "PROXY_PORT=7897"
 
 rem ---------- 1. 检查本地代理端口 ----------
-echo [1/3] 检查本地代理 %PROXY_HOST%:%PROXY_PORT% ...
+echo [1/4] 检查本地代理 %PROXY_HOST%:%PROXY_PORT% ...
 powershell -NoProfile -Command "if (Test-NetConnection -ComputerName '%PROXY_HOST%' -Port %PROXY_PORT% -WarningAction SilentlyContinue).TcpTestSucceeded { exit 0 } else { exit 1 }"
 if errorlevel 1 (
-  echo        [!] 端口 %PROXY_PORT% 未监听，请先启动 Clash/Mihomo，或修改 config.json 里的 proxy.port。
+  echo        [!] 端口 %PROXY_PORT% 未监听。请先启动 Clash/Mihomo，或改 config.json 的 proxy.port。
 ) else (
   echo        [OK] 代理端口可用。
 )
 
 echo.
-rem ---------- 2. 注入代理（解决登录 / Agent 连不上） ----------
-echo [2/3] 注入代理到 Antigravity 安装目录 ...
+rem ---------- 2. 开启系统代理（窗口连本地语言服务器需要） ----------
+echo [2/4] 开启系统代理 ...
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 1 /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyServer /t REG_SZ /d "%PROXY_HOST%:%PROXY_PORT%" /f >nul 2>&1
+echo        [OK] 系统代理已开启: %PROXY_HOST%:%PROXY_PORT%
+
+echo.
+rem ---------- 3. 注入代理到安装目录 ----------
+echo [3/4] 注入代理到 Antigravity 安装目录 ...
 set "FOUND="
 for %%D in ("%LOCALAPPDATA%\Programs\antigravity" "%LOCALAPPDATA%\Programs\Antigravity IDE" "%LOCALAPPDATA%\Programs\Antigravity") do (
   if exist "%%~D\Antigravity.exe" (
@@ -38,13 +46,24 @@ for %%D in ("%LOCALAPPDATA%\Programs\antigravity" "%LOCALAPPDATA%\Programs\Antig
     set "FOUND=1"
   )
 )
-if not defined FOUND (
-  echo        [错误] 未找到 Antigravity 安装目录，请手动复制 version.dll + config.json。
+if not defined FOUND echo        [!] 未找到 Antigravity 安装目录，请手动复制 version.dll + config.json。
+
+echo.
+rem ---------- 3.5 修复 IDE 遥测钩子（否则 Agent 用工具会报错） ----------
+set "TELE=%USERPROFILE%\.gemini\config\plugins\googlecloudtools.datacloud_telemetry\hooks.json"
+if exist "%TELE%" (
+  findstr /c:"\"enabled\": true," "%TELE%" >nul 2>&1
+  if not errorlevel 1 (
+    powershell -NoProfile -Command "(Get-Content '%TELE%' -Raw) -replace '\"enabled\": true,', '\"enabled\": false,' | Set-Content '%TELE%' -NoNewline"
+    echo        [OK] 已禁用 Antigravity IDE 的坏遥测钩子(googlecloudtools.datacloud_telemetry)
+  ) else (
+    echo        [OK] 遥测钩子已是禁用状态
+  )
 )
 
 echo.
-rem ---------- 3. 汉化（可选，需要 Node.js >= 16 + git） ----------
-echo [3/3] 汉化中文界面 ...
+rem ---------- 4. 汉化（可选，需要 Node.js >= 16 + git） ----------
+echo [4/4] 汉化中文界面 ...
 where node >nul 2>&1
 if errorlevel 1 (
   echo        [跳过] 未检测到 Node.js，跳过汉化（登录修复已生效）。
@@ -69,7 +88,9 @@ if exist "%CN_DIR%\cli.js" (
 :done
 echo.
 echo ==========================================================
-echo   完成！请重新打开 Antigravity：登录正常、启动 Agent、中文界面。
+echo   完成！请重新打开 Antigravity / Antigravity IDE：
+echo     - 登录正常、启动 Agent、中文界面
+echo     - 代理节点请用「美国/支持地区 + 普通住宅 IP」（数据中心 IP 会被 Google 拒）
 echo   还原英文/移除代理：运行 uninstall.bat
 echo ==========================================================
 echo.

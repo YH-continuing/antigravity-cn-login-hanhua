@@ -1,0 +1,8 @@
+# 本地残留/备份,不提交
+*.zip
+app.asar
+app.asar.bak
+app.asar.bak.fingerprint
+*.log
+release-notes.md
+antigravity-chinese/
