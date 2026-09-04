@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/平台-Windows%20x64-2ea44f?style=flat-square" alt="Platform">
-  <img src="https://img.shields.io/badge/许可-MIT-blue?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/platform-Windows%20x64-2ea44f?style=flat-square" alt="Platform">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
   <img src="https://img.shields.io/github/v/release/YH-continuing/antigravity-cn-login-hanhua?color=blue&style=flat-square" alt="Release">
   <img src="https://img.shields.io/github/stars/YH-continuing/antigravity-cn-login-hanhua?style=social" alt="Stars">
-  <img src="https://img.shields.io/badge/已优化-主应用%20%2B%20IDE-blueviolet?style=flat-square" alt="Covers hub + IDE">
+  <img src="https://img.shields.io/badge/covers-hub%20%2B%20IDE-blueviolet?style=flat-square" alt="Covers hub + IDE">
 </p>
 
 <p align="center">
