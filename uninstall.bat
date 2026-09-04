@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul
 setlocal
-title Antigravity 中文 No-TUN 方案 - 卸载
+title Antigravity CN No-TUN 方案 - 卸载
 
 echo ==========================================================
-echo   Antigravity No-TUN 代理方案 - 卸载（还原纯净官方状态）
+echo   Antigravity No-TUN 方案 - 卸载（还原官方纯净状态）
 echo ==========================================================
 echo.
 
@@ -19,10 +19,15 @@ for %%D in ("%LOCALAPPDATA%\Programs\antigravity" "%LOCALAPPDATA%\Programs\Antig
 )
 
 echo.
+rem 关闭系统代理（还原网络）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings" /v ProxyEnable /t REG_DWORD /d 0 /f >nul 2>&1
+echo [OK] 已关闭系统代理。
+
+echo.
 if not defined FOUND (
-  echo [提示] 未找到已安装的代理文件，无需卸载。
+  echo [提示] 未找到已安装的代理文件（可能已卸载）。
 ) else (
-  echo [完成] 已移除代理注入。请完全退出并重新启动 Antigravity。
+  echo [完成] 已移除代理注入并关闭系统代理。请完全退出并重新启动 Antigravity。
 )
 
 echo.
